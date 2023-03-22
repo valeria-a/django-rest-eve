@@ -26,3 +26,5 @@ def get_movies(request):
     query_set = Movie.objects.all()
     serializer = MovieSerializer(instance=query_set, many=True)
     return Response(serializer.data)
+
+# api/imdb/actors
