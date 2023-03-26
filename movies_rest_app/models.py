@@ -39,7 +39,7 @@ class Rating(models.Model):
         on_delete=models.CASCADE,
     )
     rating = models.SmallIntegerField(db_column='rating', null=False,
-                                       validators=[MinValueValidator(1), MaxValueValidator(10)])
+                validators=[MinValueValidator(1), MaxValueValidator(10)])
     rating_date = models.DateField(db_column='rating_date', null=False, auto_now_add=True)
 
 

@@ -28,8 +28,9 @@ from movies_rest_app.serializers import *
 def get_version(request):
     return Response({'version': 1.2})
 
+
 @api_view(['GET', 'POST'])
-def get_movies(request: Request):
+def movies(request: Request):
 
     if request.method == 'GET':
 
@@ -49,19 +50,17 @@ def get_movies(request: Request):
         if 'description' in request.query_params:
             movies_qs = movies_qs.filter(description__icontains=request.query_params['description'])
             print(movies_qs.query)
-        # if 'names_list' in request.query_params:
-        #     names = request.query_params['names_list'].lower().split(",")
-        #     movies_qs = movies_qs.filter(name__lower__in=names)
-        #     print(movies_qs.query)
 
         serializer = MovieSerializer(instance=movies_qs, many=True)
         return Response(serializer.data)
 
     else:
-        serializer = CreateMovieSerializer(data=request.data)
+        serializer = MovieSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+            new_movie = serializer.save()
+            return Response(data=MovieSerializer(instance=new_movie).data, status=201)
+        else:
+            return Response(status=400, data=serializer.errors)
 
 
 @api_view(['GET'])
@@ -93,3 +92,5 @@ def get_movie_actors(request, movie_id):
 
     serializer = CastSerializer(instance=cast_qs, many=True)
     return Response(serializer.data)
+
+
