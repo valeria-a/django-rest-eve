@@ -2,6 +2,7 @@ from django import shortcuts
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from movies_rest_app.models import *
@@ -24,31 +25,43 @@ from movies_rest_app.serializers import *
 
 
 @api_view(['GET'])
-def get_movies(request):
+def get_version(request):
+    return Response({'version': 1.2})
 
-    # get data from the DB
-    movies_qs = Movie.objects.all()
-    print(movies_qs.query)
+@api_view(['GET', 'POST'])
+def get_movies(request: Request):
 
-    if 'name' in request.query_params:
-        movies_qs = movies_qs.filter(name__iexact=request.query_params['name'])
-        print(movies_qs.query)
-    if 'duration_from' in request.query_params:
-        movies_qs = movies_qs.filter(duration_in_min__gte=request.query_params['duration_from'])
-        print(movies_qs.query)
-    if 'duration_to' in request.query_params:
-        movies_qs = movies_qs.filter(duration_in_min__lte=request.query_params['duration_to'])
-        print(movies_qs.query)
-    if 'description' in request.query_params:
-        movies_qs = movies_qs.filter(description__icontains=request.query_params['description'])
-        print(movies_qs.query)
-    # if 'names_list' in request.query_params:
-    #     names = request.query_params['names_list'].lower().split(",")
-    #     movies_qs = movies_qs.filter(name__lower__in=names)
-    #     print(movies_qs.query)
+    if request.method == 'GET':
 
-    serializer = MovieSerializer(instance=movies_qs, many=True)
-    return Response(serializer.data)
+        # get data from the DB
+        movies_qs = Movie.objects.all()
+        print(movies_qs.query)
+
+        if 'name' in request.query_params:
+            movies_qs = movies_qs.filter(name__iexact=request.query_params['name'])
+            print(movies_qs.query)
+        if 'duration_from' in request.query_params:
+            movies_qs = movies_qs.filter(duration_in_min__gte=request.query_params['duration_from'])
+            print(movies_qs.query)
+        if 'duration_to' in request.query_params:
+            movies_qs = movies_qs.filter(duration_in_min__lte=request.query_params['duration_to'])
+            print(movies_qs.query)
+        if 'description' in request.query_params:
+            movies_qs = movies_qs.filter(description__icontains=request.query_params['description'])
+            print(movies_qs.query)
+        # if 'names_list' in request.query_params:
+        #     names = request.query_params['names_list'].lower().split(",")
+        #     movies_qs = movies_qs.filter(name__lower__in=names)
+        #     print(movies_qs.query)
+
+        serializer = MovieSerializer(instance=movies_qs, many=True)
+        return Response(serializer.data)
+
+    else:
+        serializer = CreateMovieSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
 
 
 @api_view(['GET'])
@@ -62,4 +75,21 @@ def get_movie(request, movie_id):
 
     movie = get_object_or_404(Movie, id=movie_id)
     serializer = MovieDetailsSerializer(instance=movie, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_movie_actors(request, movie_id):
+    cast_qs = get_object_or_404(Movie, id=movie_id).movieactor_set.all()
+
+    # apply filters
+    if 'main_roles' in request.query_params \
+            and request.query_params.get('main_roles').lower() == 'true':
+        cast_qs = cast_qs.filter(main_role=True)
+    if 'salary_from' in request.query_params:
+        cast_qs = cast_qs.filter(salary__gte=request.query_params['salary_from'])
+    if 'salary_to' in request.query_params:
+        cast_qs = cast_qs.filter(salary__lte=request.query_params['salary_to'])
+
+    serializer = CastSerializer(instance=cast_qs, many=True)
     return Response(serializer.data)

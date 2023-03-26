@@ -16,10 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from movies_rest_app.views import get_version
+
 # api/ttt/users
 # api/imdb/movies => movies/
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/imdb/', include('movies_rest_app.urls'))
+    path('api/imdb/', include('movies_rest_app.urls')),
+    path('api/version', get_version)
 ]

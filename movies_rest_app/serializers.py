@@ -1,6 +1,8 @@
+from django.core.validators import MaxValueValidator
 from rest_framework import serializers
+from rest_framework import validators
 
-from movies_rest_app.models import Movie, Actor
+from movies_rest_app.models import *
 
 
 class ActorSerializer(serializers.ModelSerializer):
@@ -36,7 +38,28 @@ class MovieDetailsSerializer(serializers.ModelSerializer):
         exclude = ['actors']
 
 
-# class ActorSerializer(serializers.ModelSerializer):
+class CreateMovieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ['name', 'description', 'duration_in_min', 'release_year']
+
+
+# class ActorRawSerializer(serializers.Serializer):
+#
+#     def update(self, instance, validated_data):
+#         pass
+#
+#     def create(self, validated_data):
+#         pass
 #
 #     name = serializers.CharField()
-#     birth_year = serializers.IntegerField()
+#     birth_year = serializers.IntegerField(validators=[MaxValueValidator(2000)])
+#     movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+
+class CastSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MovieActor
+        exclude = ['movie', 'id']
+        depth = 1
