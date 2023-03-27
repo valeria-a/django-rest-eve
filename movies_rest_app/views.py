@@ -56,14 +56,12 @@ def movies(request: Request):
 
     else:
         serializer = MovieSerializer(data=request.data)
-        if serializer.is_valid():
-            new_movie = serializer.save()
-            return Response(data=MovieSerializer(instance=new_movie).data, status=201)
-        else:
-            return Response(status=400, data=serializer.errors)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(data=serializer.data, status=201)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def get_movie(request, movie_id):
     # try:
     #     movie = Movie.objects.get(id=movie_id)
@@ -71,10 +69,21 @@ def get_movie(request, movie_id):
     #     return Response(serializer.data)
     # except Movie.DoesNotExist:
     #     return Response(status=status.HTTP_404_NOT_FOUND)
-
     movie = get_object_or_404(Movie, id=movie_id)
-    serializer = MovieDetailsSerializer(instance=movie, many=False)
-    return Response(serializer.data)
+
+    if request.method == 'GET':
+        serializer = MovieDetailsSerializer(instance=movie, many=False)
+        return Response(serializer.data)
+    elif request.method in ('PUT', 'PATCH'):
+        serializer = MovieSerializer(instance=movie, data=request.data,
+                                     partial=request.method == 'PATCH',
+                                     context={'request': request})
+        if serializer.is_valid(raise_exception=True):
+            updated_movie = serializer.save()
+            return Response(MovieDetailsSerializer(instance=updated_movie).data)
+    else:
+        movie.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

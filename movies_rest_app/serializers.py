@@ -28,6 +28,9 @@ class MovieSerializer(serializers.ModelSerializer):
             'description': {'write_only': True, 'required': False}
         }
 
+    # def validate(self, attrs):
+    #     self.context['request']
+
 
 class MovieDetailsSerializer(serializers.ModelSerializer):
     class Meta:
