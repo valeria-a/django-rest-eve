@@ -54,3 +54,8 @@ INSERT INTO public.ratings (rating,rating_date,movie_id) VALUES
 	 (4,'2022-06-17',7),
 	 (5,'2023-01-18',7),
 	 (6,'2023-01-20',8);
+
+ALTER SEQUENCE actors_id_seq RESTART WITH 100;
+ALTER SEQUENCE movies_id_seq RESTART WITH 100;
+ALTER SEQUENCE ratings_id_seq RESTART WITH 100;
+ALTER SEQUENCE movie_actors_id_seq RESTART WITH 100;
