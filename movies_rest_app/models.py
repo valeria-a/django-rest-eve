@@ -59,3 +59,5 @@ class MovieActor(models.Model):
 
     class Meta:
         db_table = 'movie_actors'
+
+

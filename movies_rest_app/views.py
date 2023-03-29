@@ -103,9 +103,10 @@ def movie_actors(request: Request, movie_id):
 
         # serializer = CastSerializer(instance=cast_qs, many=True)
         serializer = CastWithActorNameSerializer(instance=cast_qs, many=True)
+        # serializer = AddCastSerializer(instance=cast_qs, many=True)
         return Response(serializer.data)
     else:
-        movie = get_object_or_404(Movie, id=movie_id)
+        get_object_or_404(Movie, id=movie_id)
 
         # Option 1
         # serializer = AddCastSerializer(data=request.data, context={'movie_id': movie_id})
@@ -122,7 +123,8 @@ def movie_actors(request: Request, movie_id):
         # option 3
         data = request.data.copy()
         data['movie'] = movie_id
-        serializer = AddCastSerializer(data=data)
+        # serializer = AddCastSerializer(data=data)
+        serializer = CastWithActorNameSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)

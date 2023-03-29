@@ -47,14 +47,15 @@ class CastSerializer(serializers.ModelSerializer):
         depth = 1
 
 # Option 1
-# class AddCastSerializer(serializers.Serializer):
-#
-#     actor = serializers.PrimaryKeyRelatedField(queryset=Actor.objects.all())
-#     salary = serializers.IntegerField()
-#     main_role = serializers.BooleanField()
-#
-#     def create(self, validated_data):
-#         return MovieActor.objects.create(movie_id=self.context['movie_id'], **validated_data)
+class AddCastSerializer(serializers.Serializer):
+
+    actor = serializers.PrimaryKeyRelatedField(queryset=Actor.objects.all())
+    salary = serializers.IntegerField()
+    main_role = serializers.BooleanField()
+
+
+    def create(self, validated_data):
+        return MovieActor.objects.create(movie_id=self.context['movie_id'], **validated_data)
 
 
 # Option 2
@@ -72,6 +73,8 @@ class CastSerializer(serializers.ModelSerializer):
 
 # # Option 3
 # class AddCastSerializer(serializers.ModelSerializer):
+#
+#     # movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all(), write_only=True)
 #
 #     class Meta:
 #         model = MovieActor
@@ -92,15 +95,16 @@ class AddCastSerializer(serializers.ModelSerializer):
             )
         ]
 
-    # def validate_salary(self, value):
-    #     if value > 100_000_000:
-    #         raise serializers.ValidationError('Way too much money for the role')
-    #     return value
+    def validate_salary(self, value):
+        if value > 100_000_000:
+            raise serializers.ValidationError('Way too much money for the role')
+        return value
 
 
 class CastWithActorNameSerializer(serializers.ModelSerializer):
 
     actor = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    serializers.StringRelatedField
     # Relationships must either set a queryset explicitly, or set read_only=True.
 
     class Meta:
