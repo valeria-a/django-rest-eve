@@ -86,20 +86,53 @@ def get_movie(request, movie_id):
         return Response(status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-def get_movie_actors(request, movie_id):
-    cast_qs = get_object_or_404(Movie, id=movie_id).movieactor_set.all()
+@api_view(['GET', 'POST'])
+def movie_actors(request: Request, movie_id):
 
-    # apply filters
-    if 'main_roles' in request.query_params \
-            and request.query_params.get('main_roles').lower() == 'true':
-        cast_qs = cast_qs.filter(main_role=True)
-    if 'salary_from' in request.query_params:
-        cast_qs = cast_qs.filter(salary__gte=request.query_params['salary_from'])
-    if 'salary_to' in request.query_params:
-        cast_qs = cast_qs.filter(salary__lte=request.query_params['salary_to'])
+    if request.method == 'GET':
+        cast_qs = get_object_or_404(Movie, id=movie_id).movieactor_set.all()
 
-    serializer = CastSerializer(instance=cast_qs, many=True)
-    return Response(serializer.data)
+        # apply filters
+        if 'main_roles' in request.query_params \
+                and request.query_params.get('main_roles').lower() == 'true':
+            cast_qs = cast_qs.filter(main_role=True)
+        if 'salary_from' in request.query_params:
+            cast_qs = cast_qs.filter(salary__gte=request.query_params['salary_from'])
+        if 'salary_to' in request.query_params:
+            cast_qs = cast_qs.filter(salary__lte=request.query_params['salary_to'])
+
+        # serializer = CastSerializer(instance=cast_qs, many=True)
+        serializer = CastWithActorNameSerializer(instance=cast_qs, many=True)
+        return Response(serializer.data)
+    else:
+        movie = get_object_or_404(Movie, id=movie_id)
+
+        # Option 1
+        # serializer = AddCastSerializer(data=request.data, context={'movie_id': movie_id})
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        # return Response(serializer.data)
+
+        # option 2
+        # serializer = AddCastSerializer(data=request.data, context={'movie': movie})
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        # return Response(serializer.data)
+
+        # option 3
+        data = request.data.copy()
+        data['movie'] = movie_id
+        serializer = AddCastSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
+#
+from rest_framework import generics
+#
+#
+# class MoviesApiView(generics.ListCreateAPIView):
+#
+#     queryset = Movie.objects.all()
+#     serializer_class = MovieSerializer
