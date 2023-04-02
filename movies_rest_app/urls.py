@@ -15,9 +15,9 @@ from django.urls import path, include
 from movies_rest_app import views
 
 urlpatterns = [
-    path('movies', views.movies),
-    path('movies/<int:movie_id>', views.get_movie),
-    path('movies/<int:movie_id>/actors', views.movie_actors),
+    # path('movies', views.movies),
+    # path('movies/<int:movie_id>', views.get_movie),
+    # path('movies/<int:movie_id>/actors', views.movie_actors),
 
     # path('movies', views.MoviesApiView.as_view())
 ]

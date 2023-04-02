@@ -61,3 +61,15 @@ class MovieActor(models.Model):
         db_table = 'movie_actors'
 
 
+class Oscar(models.Model):
+
+    class Meta:
+        db_table = 'oscars'
+
+    movie = models.ForeignKey('Movie', on_delete=models.RESTRICT)
+    actor = models.ForeignKey('Actor', on_delete=models.RESTRICT, null=True)
+
+    year = models.IntegerField(validators=[
+        MinValueValidator(limit_value=1927),
+
+    ])

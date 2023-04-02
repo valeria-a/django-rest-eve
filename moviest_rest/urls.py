@@ -21,8 +21,24 @@ from movies_rest_app.views import get_version
 # api/ttt/users
 # api/imdb/movies => movies/
 
+from rest_framework import routers
+
+from movies_rest_app.views_generics import MoviesViewSet
+
+router = routers.DefaultRouter()
+router.register(r'api/imdb/movies', MoviesViewSet, basename='movie')
+
+# api/imdb/movies - GET -> MoviesViewSet.list
+# api/imdb/movies - POST -> MoviesViewSet.create
+# api/imdb/movies/<movie_id> - GET -> MoviesViewSet.retrieve
+
+print("Simple router urls:", router.urls)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/imdb/', include('movies_rest_app.urls')),
+    # path('api/imdb/', include('movies_rest_app.urls')),
     path('api/version', get_version)
 ]
+urlpatterns.extend(router.urls)
+
+print(urlpatterns)
