@@ -1,10 +1,12 @@
 from django import shortcuts
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from movies_rest_app.auth.serializers import UserSerializer
 from movies_rest_app.models import *
 from movies_rest_app.serializers import *
 
@@ -128,6 +130,8 @@ def movie_actors(request: Request, movie_id):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
 
 
 #

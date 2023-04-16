@@ -15,30 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from movies_rest_app.auth.views import signup, me
 from movies_rest_app.views import get_version
-
-# api/ttt/users
-# api/imdb/movies => movies/
-
-from rest_framework import routers
-
-from movies_rest_app.views_generics import MoviesViewSet
-
-router = routers.DefaultRouter()
-router.register(r'api/imdb/movies', MoviesViewSet, basename='movie')
-
-# api/imdb/movies - GET -> MoviesViewSet.list
-# api/imdb/movies - POST -> MoviesViewSet.create
-# api/imdb/movies/<movie_id> - GET -> MoviesViewSet.retrieve
-
-print("Simple router urls:", router.urls)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/imdb/', include('movies_rest_app.urls')),
-    path('api/version', get_version)
+    path('api/imdb/', include('movies_rest_app.urls')),
+    path('api/version', get_version),
+
+    path('api/auth/login', TokenObtainPairView.as_view()),
+    path('api/auth/refresh', TokenRefreshView.as_view()),
+    path('api/auth/me', me),
+    path('api/auth/signup', signup)
 ]
-urlpatterns.extend(router.urls)
+
 
 print(urlpatterns)

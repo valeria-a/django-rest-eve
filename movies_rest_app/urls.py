@@ -12,7 +12,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
+
 from movies_rest_app import views
+from movies_rest_app.views_generics import MoviesViewSet
+
+router = routers.DefaultRouter()
+router.register(r'movies', MoviesViewSet, basename='movie')
 
 urlpatterns = [
     # path('movies', views.movies),
@@ -21,5 +27,7 @@ urlpatterns = [
 
     # path('movies', views.MoviesApiView.as_view())
 ]
+urlpatterns.extend(router.urls)
+print(urlpatterns)
 
 # api/imdb/movies/abc

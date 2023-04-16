@@ -1,7 +1,11 @@
+import datetime
+
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 # Create your models here.
+
 
 class Actor(models.Model):
 
@@ -24,12 +28,14 @@ class Movie(models.Model):
     pic_url = models.URLField(max_length=512, db_column='pic_url', null=True)
 
     actors = models.ManyToManyField(Actor, through='MovieActor')
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
 
     # def __str__(self):
     #     return self.name
 
     class Meta:
         db_table = 'movies'
+        ordering = ['id']
 
 
 class Rating(models.Model):
@@ -41,6 +47,7 @@ class Rating(models.Model):
     rating = models.SmallIntegerField(db_column='rating', null=False,
                 validators=[MinValueValidator(1), MaxValueValidator(10)])
     rating_date = models.DateField(db_column='rating_date', null=False, auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
 
 
     class Meta:
@@ -61,15 +68,17 @@ class MovieActor(models.Model):
         db_table = 'movie_actors'
 
 
-class Oscar(models.Model):
-
-    class Meta:
-        db_table = 'oscars'
-
-    movie = models.ForeignKey('Movie', on_delete=models.RESTRICT)
-    actor = models.ForeignKey('Actor', on_delete=models.RESTRICT, null=True)
-
-    year = models.IntegerField(validators=[
-        MinValueValidator(limit_value=1927),
-
-    ])
+# class Oscar(models.Model):
+#
+#     class Meta:
+#         db_table = 'oscars'
+#
+#     movie = models.ForeignKey('Movie', on_delete=models.RESTRICT)
+#     actor = models.ForeignKey('Actor', on_delete=models.RESTRICT, null=True)
+#
+#     year = models.IntegerField(validators=[
+#         MinValueValidator(limit_value=1927),
+#         lambda val: val < datetime.datetime.today().year
+#     ])
+#
+#     nomination = models.Choices
