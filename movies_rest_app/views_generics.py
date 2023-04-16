@@ -71,6 +71,6 @@ class MoviesViewSet(mixins.CreateModelMixin,
         serializer = CastWithActorNameSerializer(instance=cast_qs, many=True)
         return Response(data=serializer.data)
 
-    @action(methods=['GET'], detail=False, url_path=r'years/[0-9]{4}')
-    def rrr(self):
-        self.request.url[:-4]
+    # @action(methods=['GET'], detail=False, url_path=r'years/[0-9]{4}')
+    # def rrr(self):
+    #     self.request.url[:-4]
